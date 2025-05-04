@@ -37,7 +37,7 @@ func main() {
 	a = &v // a *Vertex implements Abser
 
 	// Abs メソッドが、 Vertex ではなく *Vertex の定義であり、 Vertex が Abser インタフェースを実装していないということになるためエラーとなります。
-	a = v
+	// a = v
 
 	fmt.Println(a.Abs())
 }
