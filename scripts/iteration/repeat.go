@@ -1,4 +1,4 @@
-package iteration
+package main
 
 func Repeat(character string) string {
 	// 文字列を5回繰り返す
