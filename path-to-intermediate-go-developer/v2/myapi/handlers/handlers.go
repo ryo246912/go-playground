@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -16,33 +15,15 @@ func Hellohandler(w http.ResponseWriter, req *http.Request) {
 	io.WriteString(w, "Hello World!\n")
 }
 func PostArticleHandler(w http.ResponseWriter, req *http.Request) {
-	length, err := strconv.Atoi(req.Header.Get("Content-Length"))
-	if err != nil {
-		http.Error(w, "cannot got content length\n", http.StatusBadRequest)
-		return
-	}
-
-	reqBodybuffer := make([]byte, length)
-
-	if _, err := req.Body.Read(reqBodybuffer); !errors.Is(err, io.EOF) {
-		http.Error(w, "fail to get request body\n", http.StatusBadRequest)
-		return
-	}
-	defer req.Body.Close()
-
 	var reqArticle models.Article
-	if err := json.Unmarshal(reqBodybuffer, &reqArticle); err != nil {
-		http.Error(w, "fail to decode json\n", http.StatusBadRequest)
-		return
-	}
-
-	article := reqArticle
-	jsonData, err := json.Marshal(article)
-	if err != nil {
+	// ストリームから直接リクエストデータを取るようにしたことで、
+	// デコード前の「Content-Lengthヘッダフィールドの値からバイトスライスを作り、そこにリクエストボディの中身を書き込む」という操作がいらないなっています。
+	if err := json.NewDecoder(req.Body).Decode(&reqArticle); err != nil {
 		http.Error(w, "fail to encode json\n", http.StatusBadRequest)
 		return
 	}
-	w.Write(jsonData)
+
+	json.NewEncoder(w).Encode(reqArticle)
 }
 func GetArticleListHandler(w http.ResponseWriter, req *http.Request) {
 	queryMap := req.URL.Query()
@@ -63,12 +44,7 @@ func GetArticleListHandler(w http.ResponseWriter, req *http.Request) {
 		models.Article1,
 		models.Article2,
 	}
-	jsonData, err := json.Marshal(articles)
-	if err != nil {
-		http.Error(w, "Invaild query parameter", http.StatusBadRequest)
-		return
-	}
-	w.Write(jsonData)
+	json.NewEncoder(w).Encode(articles)
 	io.WriteString(w, fmt.Sprintf("Article List (page %d)\n", page))
 }
 func GetArticleDetailHandler(w http.ResponseWriter, req *http.Request) {
@@ -77,29 +53,24 @@ func GetArticleDetailHandler(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "Invaild query parameter", http.StatusBadRequest)
 	}
 
-	jsonData, err := json.Marshal(models.Article1)
-	if err != nil {
-		http.Error(w, "Invaild query parameter", http.StatusBadRequest)
-		return
-	}
-	w.Write(jsonData)
+	json.NewEncoder(w).Encode(models.Article1)
 	io.WriteString(w, fmt.Sprintf("Article No%d\n", articleID))
 }
 func PostNiceArticleHandler(w http.ResponseWriter, req *http.Request) {
-	jsonData, err := json.Marshal(models.Article1)
-	if err != nil {
-		http.Error(w, "Invaild query parameter", http.StatusBadRequest)
+	var reqContent any
+	if err := json.NewDecoder(req.Body).Decode(&reqContent); err != nil {
+		http.Error(w, "Invaild json decode", http.StatusBadRequest)
 		return
 	}
-	w.Write(jsonData)
+	json.NewEncoder(w).Encode(reqContent)
 	io.WriteString(w, "Posting Nice...\n")
 }
 func PostCommentHandler(w http.ResponseWriter, req *http.Request) {
-	jsonData, err := json.Marshal(models.Comment1)
-	if err != nil {
-		http.Error(w, "Invaild query parameter", http.StatusBadRequest)
+	var reqContent any
+	if err := json.NewDecoder(req.Body).Decode(&reqContent); err != nil {
+		http.Error(w, "Invaild json decode", http.StatusBadRequest)
 		return
 	}
-	w.Write(jsonData)
+	json.NewEncoder(w).Encode(reqContent)
 	io.WriteString(w, "Posting Comment...\n")
 }
