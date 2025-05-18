@@ -5,8 +5,13 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 	"github.com/ryo246912/path-to-intermediate-go-developer/handlers"
 )
+
+func init() {
+	godotenv.Load(".env")
+}
 
 func main() {
 	r := mux.NewRouter()

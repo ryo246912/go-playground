@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/ryo246912/path-to-intermediate-go-developer/models"
 )
@@ -61,19 +62,21 @@ limit ? offset ?;
 
 func SelectArticleDetail(db *sql.DB, articleID int) (models.Article, error) {
 	const sqlStr = `
-select *
-from articles
-where article_id = ?;
-`
+	select *
+	from articles
+	where article_id = ?;
+	`
 	// (問 3) 指定 ID の記事データをデータベースから取得して、それを models.Article 構造体の形で返す処理↪
 	row := db.QueryRow(sqlStr, articleID)
 	if err := row.Err(); err != nil {
+		fmt.Println(err)
 		return models.Article{}, err
 	}
 	var article models.Article
 	var createdTime sql.NullTime
 	err := row.Scan(&article.ID, &article.Title, &article.Contents, &article.UserName, &article.NiceNum, &createdTime)
 	if err != nil {
+		fmt.Println(err)
 		return models.Article{}, err
 	}
 	if createdTime.Valid {

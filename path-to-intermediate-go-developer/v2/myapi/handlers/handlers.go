@@ -2,13 +2,13 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/ryo246912/path-to-intermediate-go-developer/models"
+	"github.com/ryo246912/path-to-intermediate-go-developer/service"
 )
 
 func Hellohandler(w http.ResponseWriter, req *http.Request) {
@@ -23,7 +23,13 @@ func PostArticleHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(reqArticle)
+	article, err := service.PostArticleService(reqArticle)
+	if err != nil {
+		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(article)
 }
 func GetArticleListHandler(w http.ResponseWriter, req *http.Request) {
 	queryMap := req.URL.Query()
@@ -40,12 +46,13 @@ func GetArticleListHandler(w http.ResponseWriter, req *http.Request) {
 		page = 1
 	}
 
-	articles := []models.Article{
-		models.Article1,
-		models.Article2,
+	articles, err := service.GetArticleListService(page)
+	if err != nil {
+		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
+		return
 	}
+
 	json.NewEncoder(w).Encode(articles)
-	io.WriteString(w, fmt.Sprintf("Article List (page %d)\n", page))
 }
 func GetArticleDetailHandler(w http.ResponseWriter, req *http.Request) {
 	articleID, err := strconv.Atoi(mux.Vars(req)["id"])
@@ -53,24 +60,40 @@ func GetArticleDetailHandler(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "Invaild query parameter", http.StatusBadRequest)
 	}
 
-	json.NewEncoder(w).Encode(models.Article1)
-	io.WriteString(w, fmt.Sprintf("Article No%d\n", articleID))
+	article, err := service.GetArticleService(articleID)
+	if err != nil {
+		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(article)
 }
 func PostNiceArticleHandler(w http.ResponseWriter, req *http.Request) {
-	var reqContent any
-	if err := json.NewDecoder(req.Body).Decode(&reqContent); err != nil {
+	var reqArticle models.Article
+	if err := json.NewDecoder(req.Body).Decode(&reqArticle); err != nil {
 		http.Error(w, "Invaild json decode", http.StatusBadRequest)
 		return
 	}
-	json.NewEncoder(w).Encode(reqContent)
-	io.WriteString(w, "Posting Nice...\n")
+
+	article, err := service.PostNiceService(reqArticle)
+	if err != nil {
+		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
+	}
+
+	json.NewEncoder(w).Encode(article)
 }
 func PostCommentHandler(w http.ResponseWriter, req *http.Request) {
-	var reqContent any
-	if err := json.NewDecoder(req.Body).Decode(&reqContent); err != nil {
+	var reqComment models.Comment
+	if err := json.NewDecoder(req.Body).Decode(&reqComment); err != nil {
 		http.Error(w, "Invaild json decode", http.StatusBadRequest)
 		return
 	}
-	json.NewEncoder(w).Encode(reqContent)
-	io.WriteString(w, "Posting Comment...\n")
+
+	comment, err := service.PostCommentService(reqComment)
+	if err != nil {
+		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(comment)
 }
