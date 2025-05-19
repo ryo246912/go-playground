@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/ryo246912/path-to-intermediate-go-developer/apperrors"
 	"github.com/ryo246912/path-to-intermediate-go-developer/controllers/services"
 	"github.com/ryo246912/path-to-intermediate-go-developer/models"
 )
@@ -23,13 +24,14 @@ func (c *ArticleController) PostArticleHandler(w http.ResponseWriter, req *http.
 	// ストリームから直接リクエストデータを取るようにしたことで、
 	// デコード前の「Content-Lengthヘッダフィールドの値からバイトスライスを作り、そこにリクエストボディの中身を書き込む」という操作がいらないなっています。
 	if err := json.NewDecoder(req.Body).Decode(&reqArticle); err != nil {
-		http.Error(w, "fail to encode json\n", http.StatusBadRequest)
+		err = apperrors.ReqBodyDecodeFailed.Wrap(err, "bad request body")
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 
 	article, err := c.service.PostArticleService(reqArticle)
 	if err != nil {
-		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 
@@ -43,7 +45,8 @@ func (c *ArticleController) GetArticleListHandler(w http.ResponseWriter, req *ht
 		var err error
 		page, err = strconv.Atoi(p[0])
 		if err != nil {
-			http.Error(w, "Invaild query parameter", http.StatusBadRequest)
+			err = apperrors.BadParam.Wrap(err, "queryparam must be number")
+			apperrors.ErrorHandler(w, req, err)
 			return
 		}
 	} else {
@@ -52,7 +55,7 @@ func (c *ArticleController) GetArticleListHandler(w http.ResponseWriter, req *ht
 
 	articles, err := c.service.GetArticleListService(page)
 	if err != nil {
-		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 
@@ -61,12 +64,13 @@ func (c *ArticleController) GetArticleListHandler(w http.ResponseWriter, req *ht
 func (c *ArticleController) GetArticleDetailHandler(w http.ResponseWriter, req *http.Request) {
 	articleID, err := strconv.Atoi(mux.Vars(req)["id"])
 	if err != nil {
-		http.Error(w, "Invaild query parameter", http.StatusBadRequest)
+		err = apperrors.BadParam.Wrap(err, "pathparam must be number")
+		apperrors.ErrorHandler(w, req, err)
 	}
 
 	article, err := c.service.GetArticleService(articleID)
 	if err != nil {
-		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 
@@ -75,13 +79,14 @@ func (c *ArticleController) GetArticleDetailHandler(w http.ResponseWriter, req *
 func (c *ArticleController) PostNiceArticleHandler(w http.ResponseWriter, req *http.Request) {
 	var reqArticle models.Article
 	if err := json.NewDecoder(req.Body).Decode(&reqArticle); err != nil {
-		http.Error(w, "Invaild json decode", http.StatusBadRequest)
+		err = apperrors.ReqBodyDecodeFailed.Wrap(err, "bad request body")
+		apperrors.ErrorHandler(w, req, err)
 		return
 	}
 
 	article, err := c.service.PostNiceService(reqArticle)
 	if err != nil {
-		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
+		apperrors.ErrorHandler(w, req, err)
 	}
 
 	json.NewEncoder(w).Encode(article)
