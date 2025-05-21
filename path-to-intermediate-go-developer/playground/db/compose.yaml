@@ -1,7 +1,8 @@
+name: path-to-intermediate-go-developer
 services:
-  mysql:
+  db:
     image: mysql:8.4
-    container_name: db-for-go
+    # container_name: db-for-go
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
