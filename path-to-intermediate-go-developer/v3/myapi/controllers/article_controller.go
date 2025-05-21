@@ -76,6 +76,7 @@ func (c *ArticleController) GetArticleDetailHandler(w http.ResponseWriter, req *
 
 	json.NewEncoder(w).Encode(article)
 }
+
 func (c *ArticleController) PostNiceArticleHandler(w http.ResponseWriter, req *http.Request) {
 	var reqArticle models.Article
 	if err := json.NewDecoder(req.Body).Decode(&reqArticle); err != nil {
