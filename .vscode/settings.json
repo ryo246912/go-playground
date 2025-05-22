@@ -1,0 +1,19 @@
+{
+  "go.lintTool": "golangci-lint",
+  "go.lintOnSave": "package",
+
+  // docsのおすすめ設定、Go拡張をプレリリースverにしないといけない？
+  // "go.lintTool": "golangci-lint-v2",
+  // unknown flag: --path-modeって怒られる
+  // "go.lintFlags": [
+  //   "--path-mode=abs",
+  //   "--fast-only"
+  // ],
+  // "go.alternateTools": {
+  //   "customFormatter": "golangci-lint-v2"
+  // },
+  // "go.formatFlags": [
+  //   "fmt",
+  //   "--stdin"
+  // ]
+}
