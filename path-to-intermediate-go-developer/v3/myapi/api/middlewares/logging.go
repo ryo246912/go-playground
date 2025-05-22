@@ -25,13 +25,18 @@ func (rsw *resLoggingWriter) WriteHeader(code int) {
 func LoggingMiddleware(next http.Handler) http.Handler {
 	// インターフェース型ということは、決められたメソッドさえ持てばどんな型でも渡すことができるということ
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		traceID := newTraceID()
+
 		// リクエスト情報をロギング
-		log.Println(req.RequestURI, req.Method)
+		log.Printf("[%d]%s %s\n", traceID, req.RequestURI, req.Method)
+		ctx := SetTraceID(req.Context(), traceID)
+		req = req.WithContext(ctx)
+
 		// 自作の ResponseWriter を作って
 		rlw := NewResLoggingWriter(w)
 
 		next.ServeHTTP(rlw, req)
 
-		log.Println("res: ", rlw.code)
+		log.Printf("[%d]res: %d", traceID, rlw.code)
 	})
 }
