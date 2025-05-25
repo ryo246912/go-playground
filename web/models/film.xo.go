@@ -6,14 +6,16 @@ import (
 	"context"
 	"database/sql"
 	"time"
+
 	"github.com/uptrace/bun"
 )
 
 // Film represents a row from 'sakila.film'.
 type Film struct {
-	FilmID             uint16         `json:"film_id"`              // film_id
 	// モデル名とテーブル名を対応付け
 	bun.BaseModel `bun:"table:film,alias:f"`
+
+	FilmID             uint16         `json:"film_id" bun:"film_id,pk,autoincrement"`              // film_id
 	Title              string         `json:"title"`                // title
 	Description        sql.NullString `json:"description"`          // description
 	ReleaseYear        sql.NullInt64  `json:"release_year"`         // release_year
@@ -28,6 +30,8 @@ type Film struct {
 	LastUpdate         time.Time      `json:"last_update"`          // last_update
 	// xo fields
 	_exists, _deleted bool
+	// relation
+	Categoris   []*FilmCategory  `bun:"rel:has-many,join:film_id=film_id"` // 1対多の関係
 }
 
 // Exists returns true when the [Film] exists in the database.

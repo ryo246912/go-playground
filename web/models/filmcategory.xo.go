@@ -5,15 +5,21 @@ package models
 import (
 	"context"
 	"time"
+
+	"github.com/uptrace/bun"
 )
 
 // FilmCategory represents a row from 'sakila.film_category'.
 type FilmCategory struct {
+	bun.BaseModel `bun:"table:film_category,alias:fc"`
+
 	FilmID     uint16    `json:"film_id"`     // film_id
 	CategoryID uint8     `json:"category_id"` // category_id
 	LastUpdate time.Time `json:"last_update"` // last_update
 	// xo fields
 	_exists, _deleted bool
+		// relation
+	Ct   *Category  `bun:"rel:belongs-to,join:category_id=category_id"` // 1対1の関係
 }
 
 // Exists returns true when the [FilmCategory] exists in the database.

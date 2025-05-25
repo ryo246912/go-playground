@@ -5,11 +5,15 @@ package models
 import (
 	"context"
 	"time"
+
+	"github.com/uptrace/bun"
 )
 
 // Category represents a row from 'sakila.category'.
 type Category struct {
-	CategoryID uint8     `json:"category_id"` // category_id
+	bun.BaseModel `bun:"table:category,alias:ct"`
+
+	CategoryID uint8     `json:"category_id" bun:"category_id,pk"` // category_id
 	Name       string    `json:"name"`        // name
 	LastUpdate time.Time `json:"last_update"` // last_update
 	// xo fields
