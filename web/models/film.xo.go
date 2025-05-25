@@ -6,11 +6,14 @@ import (
 	"context"
 	"database/sql"
 	"time"
+	"github.com/uptrace/bun"
 )
 
 // Film represents a row from 'sakila.film'.
 type Film struct {
 	FilmID             uint16         `json:"film_id"`              // film_id
+	// モデル名とテーブル名を対応付け
+	bun.BaseModel `bun:"table:film,alias:f"`
 	Title              string         `json:"title"`                // title
 	Description        sql.NullString `json:"description"`          // description
 	ReleaseYear        sql.NullInt64  `json:"release_year"`         // release_year
@@ -274,6 +277,6 @@ func (f *Film) Language(ctx context.Context, db DB) (*Language, error) {
 // Language returns the Language associated with the [Film]'s (OriginalLanguageID).
 //
 // Generated from foreign key 'fk_film_language_original'.
-func (f *Film) Language(ctx context.Context, db DB) (*Language, error) {
+func (f *Film) OriginalLanguage(ctx context.Context, db DB) (*Language, error) {
 	return LanguageByLanguageID(ctx, db, uint8(f.OriginalLanguageID.Int64))
 }

@@ -17,7 +17,8 @@ type Address struct {
 	CityID     uint16         `json:"city_id"`     // city_id
 	PostalCode sql.NullString `json:"postal_code"` // postal_code
 	Phone      string         `json:"phone"`       // phone
-	Location   Geometry       `json:"location"`    // location
+	// // GEOMETRY型を[]byteとして扱う
+	Location   []byte         `json:"location"`    // location
 	LastUpdate time.Time      `json:"last_update"` // last_update
 	// xo fields
 	_exists, _deleted bool
@@ -195,7 +196,7 @@ func AddressByCityID(ctx context.Context, db DB, cityID uint16) ([]*Address, err
 // AddressByLocation retrieves a row from 'sakila.address' as a [Address].
 //
 // Generated from index 'idx_location'.
-func AddressByLocation(ctx context.Context, db DB, location Geometry) ([]*Address, error) {
+func AddressByLocation(ctx context.Context, db DB, location []byte) ([]*Address, error) {
 	// query
 	const sqlstr = `SELECT ` +
 		`address_id, address, address2, district, city_id, postal_code, phone, location, last_update ` +

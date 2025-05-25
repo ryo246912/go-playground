@@ -49,8 +49,11 @@ func main() {
 		case "1":
 			query.Query1(db)
 		case "2":
-			fmt.Println("2を受け取りました")
-			// ここに2のときの処理を書く
+			query.Query2(db)
+		case "3":
+			query.Query3(db)
+		case "4":
+			query.Query4(db)
 		default:
 			fmt.Println("不明な引数:", os.Args[1])
 		}
