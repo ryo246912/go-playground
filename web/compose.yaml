@@ -1,0 +1,23 @@
+name: playground-go-web
+services:
+  db:
+    image: mysql:8.4
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_USER: ${ROOTUSER}
+      MYSQL_ROOT_PASSWORD: ${ROOTPASS}
+      MYSQL_DATABASE: ${DATABASE}
+      MYSQL_USER: ${USERNAME}
+      MYSQL_PASSWORD: ${USERPASS}
+      TZ: 'Asia/Tokyo'
+    ports:
+      - 3306:3306
+    volumes:
+      - ./sql:/sql
+      - db-volume:/var/lib/mysql
+
+volumes:
+  db-volume:
+
