@@ -15,7 +15,9 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - ./sql:/sql
+      # https://github.com/docker-library/docs/tree/master/mysql#initializing-a-fresh-instance
+      # /var/lib/mysqlのファイル有無でコマンド実行判定
+      - ./sql/sakila-db:/docker-entrypoint-initdb.d
       - db-volume:/var/lib/mysql
 
 volumes:
