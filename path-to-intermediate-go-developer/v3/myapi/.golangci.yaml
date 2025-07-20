@@ -1,5 +1,8 @@
 run:
   timeout: 5m
+linter:
+  enable:
+    - rowserrcheck # SQL RowsやStmtのClose忘れなど
 formatters:
   enable:
     - gofmt

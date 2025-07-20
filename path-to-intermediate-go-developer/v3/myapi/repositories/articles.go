@@ -48,7 +48,7 @@ limit ? offset ?;
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	// defer rows.Close()
 
 	var articleArray []models.Article
 	for rows.Next() {
